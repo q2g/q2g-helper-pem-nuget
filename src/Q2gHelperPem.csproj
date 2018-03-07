@@ -2,8 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RootNamespace>Q2gHelperPemNuget</RootNamespace>
+    <Authors>Konrad Mattheis und Martin Berthold</Authors>
+    <Copyright>Copyright (c) 2018</Copyright>
+    <Company>q2g</Company>
   </PropertyGroup>
 
   <ItemGroup>
