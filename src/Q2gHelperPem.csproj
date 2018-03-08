@@ -8,6 +8,7 @@
     <Authors>Konrad Mattheis und Martin Berthold</Authors>
     <Copyright>Copyright (c) 2018</Copyright>
     <Company>q2g</Company>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
