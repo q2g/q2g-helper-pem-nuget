@@ -7,7 +7,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  */
 #endregion
 
-namespace Q2gHelperPem
+namespace Q2g.HelperPem
 {
     #region Usings
     using System;
@@ -23,35 +23,36 @@ namespace Q2gHelperPem
     public static class X509Certificate2Extensions
     {
         #region Public Methods
-        public static void SavePem(this X509Certificate2 @this, string fullname, bool savePrivateKey = false)
+        public static void SavePem(this X509Certificate2 @this, string certFile, string privateKeyFile = null)
         {
             try
             {
-                var folder = Path.GetDirectoryName(fullname);
-                var name = Path.GetFileNameWithoutExtension(fullname);
+                Directory.CreateDirectory(Path.GetDirectoryName(certFile));
+                Directory.CreateDirectory(Path.GetDirectoryName(privateKeyFile));
+
                 var userKeyPair = PemCertificateHelper.userKeyPair;
-                if (savePrivateKey && userKeyPair != null)
-                    File.WriteAllText(Path.Combine(folder, $"{name}_private.key"),
+                if (!String.IsNullOrEmpty(privateKeyFile) && userKeyPair != null)
+                    File.WriteAllText(privateKeyFile,
                                       $"{PemCertificateHelper.ExportKeyToPEM(userKeyPair.Private)}" +
                                       $"\r\n{PemCertificateHelper.ExportKeyToPEM(userKeyPair.Public)}");
 
-                File.WriteAllText(Path.Combine(folder, $"{name}.pem"), PemCertificateHelper.ExportCertificateToPEM(@this));
+                File.WriteAllText(certFile, PemCertificateHelper.ExportCertificateToPEM(@this));
             }
             catch (Exception ex)
             {
-                throw new Exception("Certificate could not be saved.", ex);
+                throw new Exception($"Certificate could not be saved. cert: {certFile} - key: {privateKeyFile}", ex);
             }
         }
 
-        public static X509Certificate2 LoadPem(this X509Certificate2 @this, string fullname, string privateKeyFile = null)
+        public static X509Certificate2 LoadPem(this X509Certificate2 @this, string certFile, string privateKeyFile = null)
         {
             try
             {
-                return PemCertificateHelper.ReadPemCertificateWithPrivateKey(fullname, privateKeyFile);
+                return PemCertificateHelper.ReadPemCertificateWithPrivateKey(certFile, privateKeyFile);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Pem certificate {fullname} could not be load", ex);
+                throw new Exception($"Pem certificate {certFile} could not be loaded", ex);
             }
         }
 
@@ -63,7 +64,7 @@ namespace Q2gHelperPem
             }
             catch (Exception ex)
             {
-                throw new Exception("Certificate could not be generate.", ex);
+                throw new Exception("Certificate could not be generated.", ex);
             }
         }
 
@@ -87,7 +88,7 @@ namespace Q2gHelperPem
             }
             catch (Exception ex)
             {
-                throw new Exception("Token with datetime could not be generate.", ex);
+                throw new Exception("Token with datetime could not be generated.", ex);
             }
         }
 
@@ -99,7 +100,7 @@ namespace Q2gHelperPem
             }
             catch (Exception ex)
             {
-                throw new Exception("Token could not validate", ex);
+                throw new Exception("Token could not be validated", ex);
             }
         }
 
