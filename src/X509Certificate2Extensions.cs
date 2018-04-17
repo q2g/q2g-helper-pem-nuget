@@ -27,13 +27,16 @@ namespace Q2g.HelperPem
         {
             try
             {
+                Directory.CreateDirectory(Path.GetDirectoryName(certFile));
+                Directory.CreateDirectory(Path.GetDirectoryName(privateKeyFile));
+
                 var userKeyPair = PemCertificateHelper.userKeyPair;
                 if (!String.IsNullOrEmpty(privateKeyFile) && userKeyPair != null)
                     File.WriteAllText(privateKeyFile,
                                       $"{PemCertificateHelper.ExportKeyToPEM(userKeyPair.Private)}" +
                                       $"\r\n{PemCertificateHelper.ExportKeyToPEM(userKeyPair.Public)}");
 
-                File.WriteAllText(privateKeyFile, PemCertificateHelper.ExportCertificateToPEM(@this));
+                File.WriteAllText(certFile, PemCertificateHelper.ExportCertificateToPEM(@this));
             }
             catch (Exception ex)
             {
