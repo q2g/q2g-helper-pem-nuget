@@ -49,7 +49,7 @@ namespace q2g.HelperPem
             }
             catch (Exception ex)
             {
-                throw new Exception($"Pem certificate {certFile} could not be load", ex);
+                throw new Exception($"Pem certificate {certFile} could not be loaded", ex);
             }
         }
 
@@ -61,7 +61,7 @@ namespace q2g.HelperPem
             }
             catch (Exception ex)
             {
-                throw new Exception("Certificate could not be generate.", ex);
+                throw new Exception("Certificate could not be generated.", ex);
             }
         }
 
@@ -85,7 +85,7 @@ namespace q2g.HelperPem
             }
             catch (Exception ex)
             {
-                throw new Exception("Token with datetime could not be generate.", ex);
+                throw new Exception("Token with datetime could not be generated.", ex);
             }
         }
 
@@ -97,7 +97,7 @@ namespace q2g.HelperPem
             }
             catch (Exception ex)
             {
-                throw new Exception("Token could not validate", ex);
+                throw new Exception("Token could not be validated", ex);
             }
         }
 
