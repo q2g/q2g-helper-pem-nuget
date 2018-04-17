@@ -3,12 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <RootNamespace>Q2gHelperPem</RootNamespace>
+    <RootNamespace>q2g.HelperPem</RootNamespace>
     <PackageId>Q2gHelperPem</PackageId>
     <Authors>Konrad Mattheis und Martin Berthold</Authors>
     <Copyright>Copyright (c) 2018</Copyright>
     <Company>q2g</Company>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
   </PropertyGroup>
 
   <ItemGroup>
