@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-namespace Q2g.HelperPem
+﻿namespace Q2g.HelperPem
 {
+    #region Usings
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    #endregion
+
     public class TextCrypter : CryptoBase
     {
         public TextCrypter()
