@@ -23,75 +23,22 @@ namespace Q2g.HelperPem
     using System.Text;
     #endregion
 
-    public class PemSigner
+    public class PemSigner : CryptoBase
     {
-        #region Variables & Properties
-        private AsymmetricCipherKeyPair Pair { get; set; }
-        public RsaPrivateCrtKeyParameters PrivateKey { get; private set; }
-        public RsaKeyParameters PublicKey { get; private set; }
-        #endregion
-
         #region Constructor
         public PemSigner()
         {
-            Pair = GetKeyPair();
-            PrivateKey = Pair.Private as RsaPrivateCrtKeyParameters;
-            PublicKey = Pair.Public as RsaKeyParameters;
+            GenerateKeys();
         }
 
-        public PemSigner(string private_key_path)
+        public PemSigner(string keyPath)
         {
-            using (var reader = new StreamReader(private_key_path, Encoding.ASCII))
-            {
-                this.Init(reader);
-            }
+            ReadKey(keyPath);
         }
 
-        public PemSigner(MemoryStream private_key_stream)
+        public PemSigner(MemoryStream keyStream)
         {
-            using (var reader = new StreamReader(private_key_stream, Encoding.ASCII))
-            {
-                this.Init(reader);
-            }
-        }
-
-        private void Init(StreamReader reader)
-        {
-            var pemReader = new PemReader(reader);
-            Pair = pemReader.ReadObject() as AsymmetricCipherKeyPair;
-            PrivateKey = Pair.Private as RsaPrivateCrtKeyParameters;
-            PublicKey = Pair.Public as RsaKeyParameters;
-        }
-        #endregion
-
-        #region Private Methods
-        private AsymmetricCipherKeyPair GetKeyPair()
-        {
-            var randomGenerator = new VmpcRandomGenerator();
-            var secureRandom = new SecureRandom(randomGenerator);
-            var keyGenerationParameters = new KeyGenerationParameters(secureRandom, 2048);
-
-            var keyPairGenerator = new RsaKeyPairGenerator();
-            keyPairGenerator.Init(keyGenerationParameters);
-            return keyPairGenerator.GenerateKeyPair();
-        }
-
-        private RSACryptoServiceProvider GetRsaProvider()
-        {
-            var rsaParameters = PemUtils.ToRSAParameters(PrivateKey);
-            var rsa = new RSACryptoServiceProvider();
-            rsa.ImportParameters(rsaParameters);
-            return rsa;
-        }
-
-        private void SaveKey(string path, object key)
-        {
-            using (var writer = new StreamWriter(path, false, Encoding.ASCII))
-            {
-                var pemWriter = new PemWriter(writer);
-                pemWriter.WriteObject(key);
-                pemWriter.Writer.Flush();
-            }
+            ReadKey(keyStream);
         }
         #endregion
 
@@ -155,38 +102,6 @@ namespace Q2g.HelperPem
             catch (Exception ex)
             {
                 throw new Exception("Data could not signing.", ex);
-            }
-        }
-
-        public string EncryptText(string text)
-        {
-            try
-            {
-                var rsaProvider = GetRsaProvider();
-                var data = Encoding.UTF8.GetBytes(text);
-                var encryptedData = rsaProvider.Encrypt(data, true);
-                var base64Encrypted = Convert.ToBase64String(encryptedData);
-                return base64Encrypted;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("The text could not encrypt.", ex);
-            }
-        }
-
-        public string DecryptText(string base64EncryptedText)
-        {
-            try
-            {
-                var rsaProvider = GetRsaProvider();
-                var resultBytes = Convert.FromBase64String(base64EncryptedText);
-                var decryptedBytes = rsaProvider.Decrypt(resultBytes, true);
-                var decryptedData = Encoding.UTF8.GetString(decryptedBytes);
-                return decryptedData.ToString();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("The base64 text could not decrypt.", ex);
             }
         }
 
