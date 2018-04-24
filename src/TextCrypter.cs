@@ -29,7 +29,7 @@ namespace Q2g.HelperPem
             }
             catch (Exception ex)
             {
-                throw new Exception("The text could not encrypt.", ex);
+                throw new Exception("The text could not be encrypt.", ex);
             }
         }
 
