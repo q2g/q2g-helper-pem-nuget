@@ -8,8 +8,8 @@
     <Authors>Konrad Mattheis und Martin Berthold</Authors>
     <Copyright>Copyright (c) 2018</Copyright>
     <Company>q2g</Company>
-    <Version>$(GitVersion_NuGetVersion)</Version>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Version>$(GitVersion_NuGetVersion)</Version>
   </PropertyGroup>
 
   <ItemGroup>
