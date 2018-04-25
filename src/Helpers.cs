@@ -125,7 +125,7 @@ namespace Q2g.HelperPem
                 var info = PrivateKeyInfoFactory.CreatePrivateKeyInfo(userKeyPair.Private);
 
                 // merge into X509Certificate2
-                var x509 = new System.Security.Cryptography.X509Certificates.X509Certificate2(certificate.GetEncoded());
+                var x509 = new X509Certificate2(certificate.GetEncoded());
 
                 var seq = (Asn1Sequence)Asn1Object.FromByteArray(info.PrivateKey.GetDerEncoded());
                 if (seq.Count != 9)
@@ -135,7 +135,9 @@ namespace Q2g.HelperPem
                 var rsaparams = new RsaPrivateCrtKeyParameters(rsa.Modulus, rsa.PublicExponent, rsa.PrivateExponent,
                                                                rsa.Prime1, rsa.Prime2, rsa.Exponent1, rsa.Exponent2,
                                                                rsa.Coefficient);
+#if NET_CORE
                 x509 = x509.CopyWithPrivateKey(PemUtils.ToRSA(rsaparams));
+#endif
                 return x509;
             }
             catch (Exception ex)
@@ -204,7 +206,11 @@ namespace Q2g.HelperPem
             {
                 var keyPair = ReadPrivateKey(privateKeyFile);
                 var rsaPrivateKey = PemUtils.ToRSA(keyPair.Private as RsaPrivateCrtKeyParameters);
-                return certificate.CopyWithPrivateKey(rsaPrivateKey);
+#if NET_CORE
+                certificate = certificate.CopyWithPrivateKey(rsaPrivateKey);
+#endif
+
+                return certificate;
             }
             catch (Exception ex)
             {
@@ -212,16 +218,16 @@ namespace Q2g.HelperPem
                 return null;
             }
         }
-        #endregion
+#endregion
     }
 
     static class JwtToken
     {
-        #region Logger
+#region Logger
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        #endregion
+#endregion
 
-        #region Public Methods
+#region Public Methods
         public static string GenerateToken(X509Certificate2 Certificate, List<Claim> claims, DateTime validUntil)
         {
             try
@@ -262,32 +268,32 @@ namespace Q2g.HelperPem
                 return false;
             }
         }
-        #endregion
+#endregion
     }
 
     class QlikClientCertificate
     {
-        #region Logger
+#region Logger
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        #endregion
+#endregion
 
-        #region Enums
+#region Enums
         public enum PemStringType
         {
             Certificate,
             RsaPrivateKey
         }
-        #endregion
+#endregion
 
-        #region Properties & Variables
+#region Properties & Variables
         private string PublicCertificate { get; set; }
         private string PrivateKey { get; set; }
         private string Password { get; set; }
         private bool IsSingleFile { get; set; }
         public static string DefaultFolder => @"C:\ProgramData\Qlik\Sense\Repository\Exported Certificates\.Local Certificates";
-        #endregion
+#endregion
 
-        #region Constructor
+#region Constructor
         public QlikClientCertificate(string certKeyFilePath, string password)
         {
             PublicCertificate = File.ReadAllText(certKeyFilePath);
@@ -308,9 +314,9 @@ namespace Q2g.HelperPem
             IsSingleFile = false;
             Password = password;
         }
-        #endregion
+#endregion
 
-        #region Static Helper Functions
+#region Static Helper Functions
         //This function parses an integer size from the reader using the ASN.1 format
         private static int DecodeIntegerSize(System.IO.BinaryReader rd)
         {
@@ -456,9 +462,9 @@ namespace Q2g.HelperPem
                 rd.Close();
             }
         }
-        #endregion
+#endregion
 
-        #region Public Methods
+#region Public Methods
         public X509Certificate2 GetCertificateFromPEM(string friendlyName = "QlikClient")
         {
             try
@@ -472,7 +478,11 @@ namespace Q2g.HelperPem
 
                 var newCertificate = new X509Certificate2(certBuffer, Password);
                 var rsaPrivateKey = DecodeRsaPrivateKey(keyBuffer);
+
+#if NET_CORE
                 newCertificate = newCertificate.CopyWithPrivateKey(rsaPrivateKey);
+#endif
+
                 newCertificate.FriendlyName = friendlyName;
                 return newCertificate;
             }
@@ -482,16 +492,16 @@ namespace Q2g.HelperPem
                 return null;
             }
         }
-        #endregion
+#endregion
     }
 
     class RSAParameterTraits
     {
-        #region Logger
+#region Logger
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        #endregion
+#endregion
 
-        #region Fields
+#region Fields
         public int size_Mod = -1;
         public int size_Exp = -1;
         public int size_D = -1;
@@ -500,9 +510,9 @@ namespace Q2g.HelperPem
         public int size_DP = -1;
         public int size_DQ = -1;
         public int size_InvQ = -1;
-        #endregion
+#endregion
 
-        #region Public Methods
+#region Public Methods
         public RSAParameterTraits(int modulusLengthInBits)
         {
             try
@@ -565,7 +575,7 @@ namespace Q2g.HelperPem
                 logger.Error(ex, $"The Method \"{nameof(RSAParameterTraits)}\" has failed.");
             }
         }
-        #endregion
+#endregion
     }
-    #endregion
+#endregion
 }
