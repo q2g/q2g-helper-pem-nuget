@@ -1,22 +1,52 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk"> 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0;net452;net462</TargetFrameworks>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RootNamespace>Q2g.HelperPem</RootNamespace>
     <PackageId>Q2gHelperPem</PackageId>
     <Authors>Konrad Mattheis und Martin Berthold</Authors>
     <Copyright>Copyright (c) 2018</Copyright>
     <Company>q2g</Company>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Version>$(GitVersion_NuGetVersion)</Version>
+    <Version>$(GitVersion_NuGetVersion)</Version>   
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
+
+  <Choose>
+    <When Condition="'$(Configuration)' == 'Release'">
+      <PropertyGroup>        
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>     
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+  
+  <!--<Target Name="CheckGitStatus" BeforeTargets="CoreCompile">
+    <GitPendingChanges>
+      <Output TaskParameter="HasPendingChanges" PropertyName="GitPendingChanges" />
+    </GitPendingChanges>
+    <Error Text="Git Pending Changes. Commit before Release Builds" Condition="'$(Configuration)' == 'Release' and $(GitPendingChanges)" />
+  </Target>-->
+  
+  <Target Name="WriteVersion" AfterTargets="GetVersion">
+    <WriteLinesToFile File="$(SolutionDir)\obj\version.txt" Lines="$(GitVersion_NuGetVersion)" Overwrite="true" />
+  </Target>
+  <Target Name="SetPackageVersionFromFile" BeforeTargets="GenerateNuspec">  
+    <ReadLinesFromFile File="$(SolutionDir)\obj\version.txt">
+      <Output TaskParameter="Lines" PropertyName="PackageVersion" />
+    </ReadLinesFromFile>
+  </Target>
 
   <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="1.8.1.3" />
-    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0008" />
+    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0008">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="NLog" Version="4.5.3" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.2.2" />
-  </ItemGroup>
-  
+  </ItemGroup>  
 </Project>
