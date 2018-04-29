@@ -6,6 +6,12 @@
     <Authors>Konrad Mattheis und Martin Berthold</Authors>
     <Copyright>Copyright (c) 2018</Copyright>
     <Company>q2g</Company>
+    <RepositoryUrl>https://github.com/q2g/q2g-helper-pem-nuget</RepositoryUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/q2g/q2g-helper-pem-nuget/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://www.nuget.org/packages/Q2gHelperPem/</PackageProjectUrl>
+    <PackageTags>qlik, PEM, certificates</PackageTags>
+    <Description>Includes extensions for the class X509Certificate2, a signer, and the certificate creation for Sense Excel Reporting.</Description>
+    
     <Version>$(GitVersion_NuGetVersion)</Version>   
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
