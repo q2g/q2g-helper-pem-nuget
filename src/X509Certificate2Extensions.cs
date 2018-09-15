@@ -55,6 +55,17 @@ namespace Q2g.HelperPem
                 throw new Exception($"Pem certificate {certFile} could not be loaded", ex);
             }
         }
+        public static X509Certificate2 LoadPem(this X509Certificate2 @this, byte[] certBuffer, byte[] privateKeyBuffer = null)
+        {
+            try
+            {
+                return PemCertificateHelper.ReadPemCertificateWithPrivateKey(certBuffer, privateKeyBuffer);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Pem certificate buffer could not be loaded", ex);
+            }
+        }
 
         public static X509Certificate2 GenerateQlikJWTConformCert(this X509Certificate2 @this, string subjectName, string issuerName, int keyStrength = 2048)
         {
