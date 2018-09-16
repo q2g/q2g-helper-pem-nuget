@@ -9,6 +9,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 namespace Q2g.HelperPem
 {
+    using Org.BouncyCastle.Crypto.Parameters;
     #region Usings
     using System;
     using System.Collections.Generic;
@@ -22,20 +23,65 @@ namespace Q2g.HelperPem
 
     public static class X509Certificate2Extensions
     {
+
         #region Public Methods
+        public static void SavePem(this X509Certificate2 @this, out string cert, out   string privateKey)
+        {
+            cert = string.Empty;
+            privateKey = string.Empty;
+            try
+            {
+                if (@this.HasPrivateKey)
+                {
+#if NET452
+                    var p = (@this.PrivateKey as RSACryptoServiceProvider).ExportParameters(true);
+#else
+
+                    var p = @this.GetRSAPrivateKey().ExportParameters(true);
+#endif
+                    var key = new RsaPrivateCrtKeyParameters(
+                        new Org.BouncyCastle.Math.BigInteger(1, p.Modulus), new Org.BouncyCastle.Math.BigInteger(1, p.Exponent), new Org.BouncyCastle.Math.BigInteger(1, p.D),
+                        new Org.BouncyCastle.Math.BigInteger(1, p.P), new Org.BouncyCastle.Math.BigInteger(1, p.Q), new Org.BouncyCastle.Math.BigInteger(1, p.DP), new Org.BouncyCastle.Math.BigInteger(1, p.DQ),
+                        new Org.BouncyCastle.Math.BigInteger(1, p.InverseQ));
+                    using (var stringWriter = new StringWriter())
+                    {
+                        var pemWriter = new Org.BouncyCastle.OpenSsl.PemWriter(stringWriter);
+                        pemWriter.WriteObject(key);
+                        privateKey = stringWriter.GetStringBuilder().ToString();
+                    }
+                }
+                cert = PemCertificateHelper.ExportCertificateToPEM(@this);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Certificate could not be saved.  ", ex);
+            }
+        }
+
         public static void SavePem(this X509Certificate2 @this, string certFile, string privateKeyFile = null)
         {
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(certFile));
-                Directory.CreateDirectory(Path.GetDirectoryName(privateKeyFile));
+                if (!string.IsNullOrEmpty(privateKeyFile) && @this.HasPrivateKey)
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(privateKeyFile));
+#if NET452
+                    var p = (@this.PrivateKey as RSACryptoServiceProvider).ExportParameters(true);
+#else
 
-                var userKeyPair = PemCertificateHelper.userKeyPair;
-                if (!String.IsNullOrEmpty(privateKeyFile) && userKeyPair != null)
-                    File.WriteAllText(privateKeyFile,
-                                      $"{PemCertificateHelper.ExportKeyToPEM(userKeyPair.Private)}" +
-                                      $"\r\n{PemCertificateHelper.ExportKeyToPEM(userKeyPair.Public)}");
-
+                    var p = @this.GetRSAPrivateKey().ExportParameters(true);
+#endif
+                    var key = new RsaPrivateCrtKeyParameters(
+                        new Org.BouncyCastle.Math.BigInteger(1, p.Modulus), new Org.BouncyCastle.Math.BigInteger(1, p.Exponent), new Org.BouncyCastle.Math.BigInteger(1, p.D),
+                        new Org.BouncyCastle.Math.BigInteger(1, p.P), new Org.BouncyCastle.Math.BigInteger(1, p.Q), new Org.BouncyCastle.Math.BigInteger(1, p.DP), new Org.BouncyCastle.Math.BigInteger(1, p.DQ),
+                        new Org.BouncyCastle.Math.BigInteger(1, p.InverseQ));
+                    using (var sw = new StreamWriter(privateKeyFile))
+                    {
+                        var pemWriter = new Org.BouncyCastle.OpenSsl.PemWriter(sw);
+                        pemWriter.WriteObject(key);
+                    }
+                }
                 File.WriteAllText(certFile, PemCertificateHelper.ExportCertificateToPEM(@this));
             }
             catch (Exception ex)
@@ -53,6 +99,17 @@ namespace Q2g.HelperPem
             catch (Exception ex)
             {
                 throw new Exception($"Pem certificate {certFile} could not be loaded", ex);
+            }
+        }
+        public static X509Certificate2 LoadPem(this X509Certificate2 @this, byte[] certBuffer, byte[] privateKeyBuffer = null)
+        {
+            try
+            {
+                return PemCertificateHelper.ReadPemCertificateWithPrivateKey(certBuffer, privateKeyBuffer);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Pem certificate buffer could not be loaded", ex);
             }
         }
 
@@ -135,6 +192,6 @@ namespace Q2g.HelperPem
 
             return cert;
         }
-        #endregion
+#endregion
     }
 }
