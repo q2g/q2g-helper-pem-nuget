@@ -62,6 +62,20 @@ namespace Q2g.HelperPem
                 throw new Exception($"The file {privateKeyFile} is not a private key.", ex);
             }
         }
+        private static AsymmetricCipherKeyPair ReadPrivateKey(byte[] privateKeyBuffer)
+        {
+            try
+            {
+                if (privateKeyBuffer == null)
+                    throw new Exception("The key buffer is null.");
+                var reader = new StreamReader(new MemoryStream(privateKeyBuffer));
+                return (AsymmetricCipherKeyPair)new PemReader(reader).ReadObject();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"The file {privateKeyBuffer} is not a private key.", ex);
+            }
+        }
         #endregion
 
         #region Public Methods
@@ -135,7 +149,7 @@ namespace Q2g.HelperPem
                 var rsaparams = new RsaPrivateCrtKeyParameters(rsa.Modulus, rsa.PublicExponent, rsa.PrivateExponent,
                                                                rsa.Prime1, rsa.Prime2, rsa.Exponent1, rsa.Exponent2,
                                                                rsa.Coefficient);
-#if NETCOREAPP2_0
+#if NETCOREAPP2_0 || NETCOREAPP2_1
                 x509 = x509.CopyWithPrivateKey(PemUtils.ToRSA(rsaparams));
 #endif
                 return x509;
@@ -183,7 +197,21 @@ namespace Q2g.HelperPem
                 return null;
             }
         }
-
+        public static X509Certificate2 ReadPemCertificateWithPrivateKey(byte[] certificateBuffer, byte[] privateKeyBuffer)
+        {
+            try
+            {
+                var x509Cert = new X509Certificate2(certificateBuffer);
+                if (privateKeyBuffer!=null)
+                    x509Cert = AddPemPrivateKeyToCertificate(x509Cert, privateKeyBuffer);
+                return x509Cert;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, $"The Method \"{nameof(ReadPemCertificateWithPrivateKey)}\" has failed.");
+                return null;
+            }
+        }
         public static X509Certificate2 ReadPemCertificateWithPrivateKey(string certificateFile, string privateKeyFile)
         {
             try
@@ -206,7 +234,7 @@ namespace Q2g.HelperPem
             {
                 var keyPair = ReadPrivateKey(privateKeyFile);
                 var rsaPrivateKey = PemUtils.ToRSA(keyPair.Private as RsaPrivateCrtKeyParameters);
-#if NETCOREAPP2_0
+#if NETCOREAPP2_0 || NETCOREAPP2_1
                 certificate = certificate.CopyWithPrivateKey(rsaPrivateKey);
 #endif
 
@@ -218,7 +246,26 @@ namespace Q2g.HelperPem
                 return null;
             }
         }
-#endregion
+
+        public static X509Certificate2 AddPemPrivateKeyToCertificate(X509Certificate2 certificate, byte[] privateKeyBuffer)
+        {
+            try
+            {
+                var keyPair = ReadPrivateKey(privateKeyBuffer);
+                var rsaPrivateKey = PemUtils.ToRSA(keyPair.Private as RsaPrivateCrtKeyParameters);
+#if NETCOREAPP2_0 || NETCOREAPP2_1
+                certificate = certificate.CopyWithPrivateKey(rsaPrivateKey);
+#endif
+
+                return certificate;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, $"The Method \"{nameof(AddPemPrivateKeyToCertificate)}\" has failed.");
+                return null;
+            }
+        }
+        #endregion
     }
 
     static class JwtToken
@@ -479,7 +526,7 @@ namespace Q2g.HelperPem
                 var newCertificate = new X509Certificate2(certBuffer, Password);
                 var rsaPrivateKey = DecodeRsaPrivateKey(keyBuffer);
 
-#if NETCOREAPP2_0
+#if NETCOREAPP2_0 || NETCOREAPP2_1
                 newCertificate = newCertificate.CopyWithPrivateKey(rsaPrivateKey);
 #endif
 

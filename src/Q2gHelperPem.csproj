@@ -16,7 +16,7 @@
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-  </PropertyGroup>
+  </PropertyGroup> 
 
   <Choose>
     <When Condition="'$(Configuration)' == 'Release'">
@@ -31,22 +31,6 @@
     </Otherwise>
   </Choose>
   
-  <!--<Target Name="CheckGitStatus" BeforeTargets="CoreCompile">
-    <GitPendingChanges>
-      <Output TaskParameter="HasPendingChanges" PropertyName="GitPendingChanges" />
-    </GitPendingChanges>
-    <Error Text="Git Pending Changes. Commit before Release Builds" Condition="'$(Configuration)' == 'Release' and $(GitPendingChanges)" />
-  </Target>-->
-  
-  <Target Name="WriteVersion" AfterTargets="GetVersion">
-    <WriteLinesToFile File="$(SolutionDir)\obj\version.txt" Lines="$(GitVersion_NuGetVersion)" Overwrite="true" />
-  </Target>
-  <Target Name="SetPackageVersionFromFile" BeforeTargets="GenerateNuspec">  
-    <ReadLinesFromFile File="$(SolutionDir)\obj\version.txt">
-      <Output TaskParameter="Lines" PropertyName="PackageVersion" />
-    </ReadLinesFromFile>
-  </Target>
-
   <Target Name="PublishToNugetWithAPIKey" AfterTargets="GenerateNuspec">
     <ReadLinesFromFile File="$(SolutionDir)\..\..\nugetapikey.txt">
       <Output TaskParameter="Lines" PropertyName="NugetAPIKey" />
