@@ -9,7 +9,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 namespace Q2g.HelperPem
 {
-    using Org.BouncyCastle.Crypto.Parameters;
     #region Usings
     using System;
     using System.Collections.Generic;
@@ -18,12 +17,12 @@ namespace Q2g.HelperPem
     using System.Security.Claims;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
+    using Org.BouncyCastle.Crypto.Parameters;
     using System.Text;
     #endregion
 
     public static class X509Certificate2Extensions
     {
-
         #region Public Methods
         public static void SavePem(this X509Certificate2 @this, out string cert, out   string privateKey)
         {
