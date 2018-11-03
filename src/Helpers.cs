@@ -196,6 +196,7 @@ namespace Q2g.HelperPem
                 return null;
             }
         }
+
         public static X509Certificate2 ReadPemCertificateWithPrivateKey(byte[] certificateBuffer, byte[] privateKeyBuffer)
         {
             try
@@ -211,6 +212,7 @@ namespace Q2g.HelperPem
                 return null;
             }
         }
+
         public static X509Certificate2 ReadPemCertificateWithPrivateKey(string certificateFile, string privateKeyFile)
         {
             try
@@ -226,6 +228,7 @@ namespace Q2g.HelperPem
                 return null;
             }
         }
+
         public static X509Certificate2 ReadPemCertificateWithPrivateKey(byte[] certificateBuffer, byte[] privateKeyBuffer, string password = null)
         {
             try
@@ -241,25 +244,21 @@ namespace Q2g.HelperPem
 
             }
         }
+
         public static X509Certificate2 ReadPemCertificateWithPrivateKey(string certificateFile, string privateKeyFile, string password)
                     => ReadPemCertificateWithPrivateKey(File.ReadAllBytes(certificateFile), File.ReadAllBytes(privateKeyFile), password);
-
-
 
         public static X509Certificate2 AddPemPrivateKeyToCertificate(X509Certificate2 certificate, string privateKeyFile, string password = null)
                         => AddPemPrivateKeyToCertificate(certificate, System.IO.File.ReadAllBytes(privateKeyFile), password);
 
         public static X509Certificate2 AddPemPrivateKey(this X509Certificate2 certificate, string privateKeyFile, string password = null)
-                        => AddPemPrivateKeyToCertificate(certificate, System.IO.File.ReadAllBytes(privateKeyFile), password);
+                    => AddPemPrivateKeyToCertificate(certificate, System.IO.File.ReadAllBytes(privateKeyFile), password);
 
         public static X509Certificate2 AddPemPrivateKey(this X509Certificate2 certificate, byte[] privateKeyBuffer, string password = null)
                     => AddPemPrivateKeyToCertificate(certificate, privateKeyBuffer, password);
 
-     
-        public static X509Certificate2 CopyWithPrivateKey(this X509Certificate2 certificate, AsymmetricCipherKeyPair rsa, string password)
-        {
-            return new X509Certificate2(CreatePfxFile(new X509CertificateParser().ReadCertificate(certificate.RawData), rsa.Private), password, System.Security.Cryptography.X509Certificates.X509KeyStorageFlags.Exportable);
-        }
+        public static X509Certificate2 CopyWithPrivateKey(this X509Certificate2 certificate, AsymmetricCipherKeyPair rsa, string password) 
+                    => new X509Certificate2(CreatePfxFile(new X509CertificateParser().ReadCertificate(certificate.RawData), rsa.Private), password, System.Security.Cryptography.X509Certificates.X509KeyStorageFlags.Exportable);
         private static byte[] CreatePfxFile(Org.BouncyCastle.X509.X509Certificate certificate, AsymmetricKeyParameter privateKey, string password = null)
         {
             // create certificate entry
