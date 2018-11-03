@@ -36,6 +36,18 @@ namespace Q2g.HelperPem
     #endregion
 
     #region Helper Classes
+    public class PasswordFinder : IPasswordFinder
+    {
+        string passwrd_;
+        public PasswordFinder(string passwrd)
+        {
+            passwrd_ = passwrd;
+        }
+        public char[] GetPassword()
+        {
+            return passwrd_.ToCharArray();
+        }
+    }
     static class PemCertificateHelper
     {
         #region Logger
@@ -47,29 +59,16 @@ namespace Q2g.HelperPem
         #endregion
 
         #region Private Methods
-        private static AsymmetricCipherKeyPair ReadPrivateKey(string privateKeyFile)
-        {
-            try
-            {
-                if (!File.Exists(privateKeyFile))
-                    throw new Exception("The key file not exists.");
+        public static AsymmetricCipherKeyPair ReadPrivateKey(string privateKeyFile, PasswordFinder password = null) => ReadPrivateKey(File.ReadAllBytes(privateKeyFile), password);
 
-                using (var reader = File.OpenText(privateKeyFile))
-                    return (AsymmetricCipherKeyPair)new PemReader(reader).ReadObject();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"The file {privateKeyFile} is not a private key.", ex);
-            }
-        }
-        private static AsymmetricCipherKeyPair ReadPrivateKey(byte[] privateKeyBuffer)
+        public static AsymmetricCipherKeyPair ReadPrivateKey(byte[] privateKeyBuffer, PasswordFinder password = null)
         {
             try
             {
                 if (privateKeyBuffer == null)
                     throw new Exception("The key buffer is null.");
                 var reader = new StreamReader(new MemoryStream(privateKeyBuffer));
-                return (AsymmetricCipherKeyPair)new PemReader(reader).ReadObject();
+                return (AsymmetricCipherKeyPair)new PemReader(reader,password).ReadObject();
             }
             catch (Exception ex)
             {
@@ -141,7 +140,7 @@ namespace Q2g.HelperPem
                 // merge into X509Certificate2
                 var x509 = new X509Certificate2(certificate.GetEncoded());
 
-                var seq = (Asn1Sequence)Asn1Object.FromByteArray(info.PrivateKey.GetDerEncoded());
+                var seq = (Asn1Sequence)Asn1Object.FromByteArray(info.ParsePrivateKey().GetDerEncoded());
                 if (seq.Count != 9)
                     throw new Exception("malformed sequence in RSA private key");
 
@@ -160,7 +159,7 @@ namespace Q2g.HelperPem
                 return null;
             }
         }
-
+     
         public static string ExportCertificateToPEM(X509Certificate2 cert)
         {
             try
@@ -227,36 +226,75 @@ namespace Q2g.HelperPem
                 return null;
             }
         }
-
-        public static X509Certificate2 AddPemPrivateKeyToCertificate(X509Certificate2 certificate, string privateKeyFile)
+        public static X509Certificate2 ReadPemCertificateWithPrivateKey(byte[] certificateBuffer, byte[] privateKeyBuffer, string password = null)
         {
             try
             {
-                var keyPair = ReadPrivateKey(privateKeyFile);
-                var rsaPrivateKey = PemUtils.ToRSA(keyPair.Private as RsaPrivateCrtKeyParameters);
-#if NETCOREAPP2_0 || NETCOREAPP2_1
-                certificate = certificate.CopyWithPrivateKey(rsaPrivateKey);
-#endif
-
-                return certificate;
+                var x509Cert = new X509Certificate2(certificateBuffer, password);
+                if (privateKeyBuffer != null)
+                    x509Cert = AddPemPrivateKeyToCertificate(x509Cert, privateKeyBuffer, password);
+                return x509Cert;
             }
             catch (Exception ex)
             {
-                logger.Error(ex, $"The Method \"{nameof(AddPemPrivateKeyToCertificate)}\" has failed.");
-                return null;
+                throw new Exception($"The Method \"{nameof(ReadPemCertificateWithPrivateKey)}\" has failed.", ex);
+
             }
         }
+        public static X509Certificate2 ReadPemCertificateWithPrivateKey(string certificateFile, string privateKeyFile, string password)
+                    => ReadPemCertificateWithPrivateKey(File.ReadAllBytes(certificateFile), File.ReadAllBytes(privateKeyFile), password);
 
-        public static X509Certificate2 AddPemPrivateKeyToCertificate(X509Certificate2 certificate, byte[] privateKeyBuffer)
+
+
+        public static X509Certificate2 AddPemPrivateKeyToCertificate(X509Certificate2 certificate, string privateKeyFile, string password = null)
+                        => AddPemPrivateKeyToCertificate(certificate, System.IO.File.ReadAllBytes(privateKeyFile), password);
+
+        public static X509Certificate2 AddPemPrivateKey(this X509Certificate2 certificate, string privateKeyFile, string password = null)
+                        => AddPemPrivateKeyToCertificate(certificate, System.IO.File.ReadAllBytes(privateKeyFile), password);
+
+        public static X509Certificate2 AddPemPrivateKey(this X509Certificate2 certificate, byte[] privateKeyBuffer, string password = null)
+                    => AddPemPrivateKeyToCertificate(certificate, privateKeyBuffer, password);
+
+     
+        public static X509Certificate2 CopyWithPrivateKey(this X509Certificate2 certificate, AsymmetricCipherKeyPair rsa, string password)
+        {
+            return new X509Certificate2(CreatePfxFile(new X509CertificateParser().ReadCertificate(certificate.RawData), rsa.Private), password, System.Security.Cryptography.X509Certificates.X509KeyStorageFlags.Exportable);
+        }
+        private static byte[] CreatePfxFile(Org.BouncyCastle.X509.X509Certificate certificate, AsymmetricKeyParameter privateKey, string password = null)
+        {
+            // create certificate entry
+            var certEntry = new X509CertificateEntry(certificate);
+            string friendlyName = certificate.SubjectDN.ToString();
+
+            // get bytes of private key.
+            PrivateKeyInfo keyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(privateKey);
+            byte[] keyBytes = keyInfo.ToAsn1Object().GetEncoded();
+
+            var builder = new Pkcs12StoreBuilder();
+            builder.SetUseDerEncoding(true);
+            var store = builder.Build();
+            // create store entry
+            store.SetKeyEntry("", new AsymmetricKeyEntry(privateKey), new X509CertificateEntry[] { certEntry });
+            byte[] pfxBytes = null;
+            using (MemoryStream stream = new MemoryStream())
+            {
+                store.Save(stream, password?.ToCharArray(), new SecureRandom());
+                pfxBytes = stream.ToArray();
+            }
+            var result = Pkcs12Utilities.ConvertToDefiniteLength(pfxBytes);
+            return result;
+        }
+        public static X509Certificate2 AddPemPrivateKeyToCertificate(X509Certificate2 certificate, byte[] privateKeyBuffer,string password=null)
         {
             try
             {
-                var keyPair = ReadPrivateKey(privateKeyBuffer);
+                var keyPair = ReadPrivateKey(privateKeyBuffer ,password != null ? new PasswordFinder(password) : null);
                 var rsaPrivateKey = PemUtils.ToRSA(keyPair.Private as RsaPrivateCrtKeyParameters);
 #if NETCOREAPP2_0 || NETCOREAPP2_1
                 certificate = certificate.CopyWithPrivateKey(rsaPrivateKey);
+#else 
+                certificate = certificate.CopyWithPrivateKey(keyPair, password);
 #endif
-
                 return certificate;
             }
             catch (Exception ex)

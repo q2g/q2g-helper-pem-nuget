@@ -65,7 +65,7 @@ namespace Q2g.HelperPem
                 if (!string.IsNullOrEmpty(privateKeyFile) && @this.HasPrivateKey)
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(privateKeyFile));
-#if NET452
+#if NET452 ||NET462
                     var p = (@this.PrivateKey as RSACryptoServiceProvider).ExportParameters(true);
 #else
 
@@ -100,11 +100,11 @@ namespace Q2g.HelperPem
                 throw new Exception($"Pem certificate {certFile} could not be loaded", ex);
             }
         }
-        public static X509Certificate2 LoadPem(this X509Certificate2 @this, byte[] certBuffer, byte[] privateKeyBuffer = null)
+        public static X509Certificate2 LoadPem(this X509Certificate2 @this, byte[] certBuffer, byte[] privateKeyBuffer = null,string password=null)
         {
             try
             {
-                return PemCertificateHelper.ReadPemCertificateWithPrivateKey(certBuffer, privateKeyBuffer);
+                return PemCertificateHelper.ReadPemCertificateWithPrivateKey(certBuffer, privateKeyBuffer, password);
             }
             catch (Exception ex)
             {
