@@ -48,6 +48,7 @@ namespace Q2g.HelperPem
             return passwrd_.ToCharArray();
         }
     }
+
     static class PemCertificateHelper
     {
         #region Logger
@@ -241,7 +242,6 @@ namespace Q2g.HelperPem
             catch (Exception ex)
             {
                 throw new Exception($"The Method \"{nameof(ReadPemCertificateWithPrivateKey)}\" has failed.", ex);
-
             }
         }
 
@@ -283,6 +283,7 @@ namespace Q2g.HelperPem
             var result = Pkcs12Utilities.ConvertToDefiniteLength(pfxBytes);
             return result;
         }
+
         public static X509Certificate2 AddPemPrivateKeyToCertificate(X509Certificate2 certificate, byte[] privateKeyBuffer,string password=null)
         {
             try
