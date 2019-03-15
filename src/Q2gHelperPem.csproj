@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk"> 
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>Q2g.HelperPem</RootNamespace>
     <PackageId>Q2gHelperPem</PackageId>
@@ -10,12 +10,7 @@
     <PackageProjectUrl>https://www.nuget.org/packages/Q2gHelperPem/</PackageProjectUrl>
     <PackageTags>qlik, PEM, certificates</PackageTags>
     <Description>Includes extensions for the class X509Certificate2, a signer, and the certificate creation.</Description>
-    
-    <Version>$(GitVersion_NuGetVersion)</Version>   
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-
+    <Version>$(GitVersion_NuGetVersion)</Version>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
@@ -24,20 +19,20 @@
   <Choose>
     <When Condition="'$(MSBuildRuntimeType)' == 'Core'">
       <PropertyGroup>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <TargetFrameworks>netcoreapp2.1;netcoreapp2.2</TargetFrameworks>
       </PropertyGroup>
     </When>
     <Otherwise>
       <PropertyGroup>
-        <TargetFrameworks>netcoreapp2.1;net452;net462</TargetFrameworks>
+        <TargetFrameworks>netcoreapp2.1;netcoreapp2.2;net452;net462</TargetFrameworks>
       </PropertyGroup>
     </Otherwise>
   </Choose>
-  
+
   <Choose>
     <When Condition="'$(Configuration)' == 'Release'">
-      <PropertyGroup>        
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>     
+      <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
       </PropertyGroup>
     </When>
     <Otherwise>
@@ -46,19 +41,19 @@
       </PropertyGroup>
     </Otherwise>
   </Choose>
-  
+
   <Target Name="PublishToNugetWithAPIKey" AfterTargets="GenerateNuspec">
     <ReadLinesFromFile File="$(SolutionDir)\..\..\nugetapikey.txt">
       <Output TaskParameter="Lines" PropertyName="NugetAPIKey" />
     </ReadLinesFromFile>
     <Exec WorkingDirectory="$(BaseDir)" Command="dotnet nuget push $(PackageOutputAbsolutePath)$(PackageId).$(PackageVersion).nupkg -k $(NugetAPIKey) -s https://api.nuget.org/v3/index.json" />
   </Target>
-  
+
   <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="1.8.3" />
-    <PackageReference Include="GitVersionTask" Version="4.0.0" PrivateAssets="All"/>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All"/>
-    <PackageReference Include="NLog" Version="4.5.10" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.3.0" />
-  </ItemGroup>  
+    <PackageReference Include="GitVersionTask" Version="4.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
+    <PackageReference Include="NLog" Version="4.5.11" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.4.0" />
+  </ItemGroup>
 </Project>
