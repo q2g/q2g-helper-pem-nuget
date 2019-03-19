@@ -50,7 +50,7 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="BouncyCastle.NetCore" Version="1.8.3" />
+    <PackageReference Include="BouncyCastle.NetCore" Version="1.8.5" />
     <PackageReference Include="GitVersionTask" Version="4.0.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
     <PackageReference Include="NLog" Version="4.5.11" />
