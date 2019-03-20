@@ -16,6 +16,12 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
+  <Target Name="SetNetConstant" BeforeTargets="GetAssemblyVersion">
+    <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
+      <DefineConstants>$(DefineConstants);NETCORE;</DefineConstants>
+    </PropertyGroup>
+  </Target>
+
   <Choose>
     <When Condition="'$(MSBuildRuntimeType)' == 'Core'">
       <PropertyGroup>
