@@ -149,7 +149,7 @@ namespace Q2g.HelperPem
                 var rsaparams = new RsaPrivateCrtKeyParameters(rsa.Modulus, rsa.PublicExponent, rsa.PrivateExponent,
                                                                rsa.Prime1, rsa.Prime2, rsa.Exponent1, rsa.Exponent2,
                                                                rsa.Coefficient);
-#if NETCOREAPP2_0 || NETCOREAPP2_1
+#if NETCORE
                 x509 = x509.CopyWithPrivateKey(PemUtils.ToRSA(rsaparams));
 #endif
                 return x509;
@@ -234,7 +234,7 @@ namespace Q2g.HelperPem
             {
                 var keyPair = ReadPrivateKey(privateKeyFile);
                 var rsaPrivateKey = PemUtils.ToRSA(keyPair.Private as RsaPrivateCrtKeyParameters);
-#if NETCOREAPP2_0 || NETCOREAPP2_1
+#if NETCORE
                 certificate = certificate.CopyWithPrivateKey(rsaPrivateKey);
 #endif
 
@@ -253,7 +253,7 @@ namespace Q2g.HelperPem
             {
                 var keyPair = ReadPrivateKey(privateKeyBuffer);
                 var rsaPrivateKey = PemUtils.ToRSA(keyPair.Private as RsaPrivateCrtKeyParameters);
-#if NETCOREAPP2_0 || NETCOREAPP2_1
+#if NETCORE
                 certificate = certificate.CopyWithPrivateKey(rsaPrivateKey);
 #endif
 
@@ -526,7 +526,7 @@ namespace Q2g.HelperPem
                 var newCertificate = new X509Certificate2(certBuffer, Password);
                 var rsaPrivateKey = DecodeRsaPrivateKey(keyBuffer);
 
-#if NETCOREAPP2_0 || NETCOREAPP2_1
+#if NETCORE
                 newCertificate = newCertificate.CopyWithPrivateKey(rsaPrivateKey);
 #endif
 
