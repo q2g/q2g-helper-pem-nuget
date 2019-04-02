@@ -526,8 +526,10 @@ namespace Q2g.HelperPem
                 var newCertificate = new X509Certificate2(certBuffer, Password);
                 var rsaPrivateKey = DecodeRsaPrivateKey(keyBuffer);
 
-#if NETCORE
+#if (NETCORE)
                 newCertificate = newCertificate.CopyWithPrivateKey(rsaPrivateKey);
+#else
+                newCertificate.PrivateKey = rsaPrivateKey;
 #endif
 
                 newCertificate.FriendlyName = friendlyName;
