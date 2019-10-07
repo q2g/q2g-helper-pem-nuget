@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>Q2g.HelperPem</RootNamespace>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <PackageId>Q2gHelperPem</PackageId>
     <Authors>Konrad Mattheis und Martin Berthold</Authors>
     <Copyright>Copyright (c) 2019</Copyright>
@@ -16,25 +17,6 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
-  <Target Name="SetNetConstant" BeforeTargets="GetAssemblyVersion">
-    <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
-      <DefineConstants>$(DefineConstants);NETCORE;</DefineConstants>
-    </PropertyGroup>
-  </Target>
-
-  <Choose>
-    <When Condition="'$(MSBuildRuntimeType)' == 'Core'">
-      <PropertyGroup>
-        <TargetFrameworks>netcoreapp2.1;netcoreapp2.2;netcoreapp3.0</TargetFrameworks>
-      </PropertyGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <TargetFrameworks>netcoreapp2.1;netcoreapp2.2;netcoreapp3.0;net452;net462</TargetFrameworks>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
-
   <Choose>
     <When Condition="'$(Configuration)' == 'Release'">
       <PropertyGroup>
@@ -48,12 +30,12 @@
     </Otherwise>
   </Choose>
 
-  <Target Name="PublishToNugetWithAPIKey" AfterTargets="GenerateNuspec" Condition="Exists('$(SolutionDir)\..\..\nugetapikey.txt')">
+  <!--<Target Name="PublishToNugetWithAPIKey" AfterTargets="GenerateNuspec" Condition="Exists('$(SolutionDir)\..\..\nugetapikey.txt')">
     <ReadLinesFromFile File="$(SolutionDir)\..\..\nugetapikey.txt">
       <Output TaskParameter="Lines" PropertyName="NugetAPIKey" />
     </ReadLinesFromFile>
     <Exec WorkingDirectory="$(BaseDir)" Command="dotnet nuget push $(PackageOutputAbsolutePath)$(PackageId).$(PackageVersion).nupkg -k $(NugetAPIKey) -s https://api.nuget.org/v3/index.json" />
-  </Target>
+  </Target>-->
 
   <ItemGroup>
     <PackageReference Include="GitVersionTask" Version="5.0.1" PrivateAssets="All" />
