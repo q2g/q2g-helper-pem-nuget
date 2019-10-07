@@ -149,9 +149,7 @@ namespace Q2g.HelperPem
                 var rsaparams = new RsaPrivateCrtKeyParameters(rsa.Modulus, rsa.PublicExponent, rsa.PrivateExponent,
                                                                rsa.Prime1, rsa.Prime2, rsa.Exponent1, rsa.Exponent2,
                                                                rsa.Coefficient);
-#if NETCORE
                 x509 = x509.CopyWithPrivateKey(PemUtils.ToRSA(rsaparams));
-#endif
                 return x509;
             }
             catch (Exception ex)
@@ -234,10 +232,7 @@ namespace Q2g.HelperPem
             {
                 var keyPair = ReadPrivateKey(privateKeyFile);
                 var rsaPrivateKey = PemUtils.ToRSA(keyPair.Private as RsaPrivateCrtKeyParameters);
-#if NETCORE
                 certificate = certificate.CopyWithPrivateKey(rsaPrivateKey);
-#endif
-
                 return certificate;
             }
             catch (Exception ex)
@@ -253,10 +248,7 @@ namespace Q2g.HelperPem
             {
                 var keyPair = ReadPrivateKey(privateKeyBuffer);
                 var rsaPrivateKey = PemUtils.ToRSA(keyPair.Private as RsaPrivateCrtKeyParameters);
-#if NETCORE
                 certificate = certificate.CopyWithPrivateKey(rsaPrivateKey);
-#endif
-
                 return certificate;
             }
             catch (Exception ex)
@@ -525,13 +517,9 @@ namespace Q2g.HelperPem
 
                 var newCertificate = new X509Certificate2(certBuffer, Password);
                 var rsaPrivateKey = DecodeRsaPrivateKey(keyBuffer);
-
-#if (NETCORE)
                 newCertificate = newCertificate.CopyWithPrivateKey(rsaPrivateKey);
-#else
-                newCertificate.PrivateKey = rsaPrivateKey;
-#endif
-
+                //only in .NET Classic
+                //newCertificate.PrivateKey = rsaPrivateKey;
                 newCertificate.FriendlyName = friendlyName;
                 return newCertificate;
             }
