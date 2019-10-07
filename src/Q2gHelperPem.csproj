@@ -3,7 +3,7 @@
     <RootNamespace>Q2g.HelperPem</RootNamespace>
     <PackageId>Q2gHelperPem</PackageId>
     <Authors>Konrad Mattheis und Martin Berthold</Authors>
-    <Copyright>Copyright (c) 2018</Copyright>
+    <Copyright>Copyright (c) 2019</Copyright>
     <Company>q2g</Company>
     <RepositoryUrl>https://github.com/q2g/q2g-helper-pem-nuget</RepositoryUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/q2g/q2g-helper-pem-nuget/master/LICENSE</PackageLicenseUrl>
@@ -30,7 +30,7 @@
     </When>
     <Otherwise>
       <PropertyGroup>
-        <TargetFrameworks>netcoreapp2.1;netcoreapp2.2;net452;net462</TargetFrameworks>
+        <TargetFrameworks>netcoreapp2.1;netcoreapp2.2;netcoreapp3.0;net452;net462</TargetFrameworks>
       </PropertyGroup>
     </Otherwise>
   </Choose>
