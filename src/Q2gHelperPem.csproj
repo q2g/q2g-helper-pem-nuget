@@ -3,7 +3,7 @@
     <RootNamespace>Q2g.HelperPem</RootNamespace>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <PackageId>Q2gHelperPem</PackageId>
-    <Authors>Konrad Mattheis und Martin Berthold</Authors>
+    <Authors>akquinet finance &amp; controlling GmbH</Authors>
     <Copyright>Copyright (c) 2019</Copyright>
     <Company>q2g</Company>
     <RepositoryUrl>https://github.com/q2g/q2g-helper-pem-nuget</RepositoryUrl>
