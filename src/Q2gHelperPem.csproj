@@ -4,11 +4,11 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PackageId>Q2gHelperPem</PackageId>
     <Authors>akquinet finance &amp; controlling GmbH</Authors>
-    <Copyright>Copyright (c) 2019</Copyright>
+    <Copyright>Copyright (c) $([System.DateTime]::Today.ToString('yyyy'))</Copyright>
     <Company>akquinet finance &amp; controlling GmbH</Company>
     <RepositoryUrl>https://github.com/q2g/q2g-helper-pem-nuget</RepositoryUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/q2g/q2g-helper-pem-nuget/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://www.nuget.org/packages/Q2gHelperPem/</PackageProjectUrl>
+    <PackageProjectUrl></PackageProjectUrl>
     <PackageTags>qlik, PEM, certificates</PackageTags>
     <Description>Includes extensions for the class X509Certificate2, a signer, and the certificate creation.</Description>
     <Version>$(GitVersion_InformationalVersion)</Version>
