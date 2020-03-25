@@ -8,6 +8,7 @@
     using Org.BouncyCastle.Asn1.X509;
     using Org.BouncyCastle.Crypto;
     using Org.BouncyCastle.Crypto.Generators;
+    using Org.BouncyCastle.Crypto.Operators;
     using Org.BouncyCastle.Crypto.Parameters;
     using Org.BouncyCastle.Crypto.Prng;
     using Org.BouncyCastle.Math;
@@ -85,10 +86,6 @@
                 var serialNumber = BigInteger.ProbablePrime(128, new Random());
                 certificateGenerator.SetSerialNumber(serialNumber);
 
-                // Signature Algorithm
-                var signatureAlgorithm = "SHA512WithRSA";
-                certificateGenerator.SetSignatureAlgorithm(signatureAlgorithm);
-
                 // Issuer and Subject Name
                 var subjectDN = new X509Name(subjectName);
                 var issuerDN = new X509Name(issuerName);
@@ -123,8 +120,11 @@
                 // Generating the Certificate
                 var issuerKeyPair = userKeyPair;
 
+                // Signature Algorithm
+                ISignatureFactory signatureFactory = new Asn1SignatureFactory("SHA512WITHRSA", userKeyPair.Private, random);
+           
                 // selfsign certificate
-                var certificate = certificateGenerator.Generate(userKeyPair.Private, random);
+                var certificate = certificateGenerator.Generate(signatureFactory);
 
                 // correcponding private key
                 var info = PrivateKeyInfoFactory.CreatePrivateKeyInfo(userKeyPair.Private);
