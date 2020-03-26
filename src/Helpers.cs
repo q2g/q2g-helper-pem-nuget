@@ -122,7 +122,7 @@
 
                 // Signature Algorithm
                 ISignatureFactory signatureFactory = new Asn1SignatureFactory("SHA512WITHRSA", userKeyPair.Private, random);
-           
+
                 // selfsign certificate
                 var certificate = certificateGenerator.Generate(signatureFactory);
 
@@ -191,7 +191,7 @@
             try
             {
                 var x509Cert = new X509Certificate2(certificateBuffer);
-                if (privateKeyBuffer!=null)
+                if (privateKeyBuffer != null)
                     x509Cert = AddPemPrivateKeyToCertificate(x509Cert, privateKeyBuffer);
                 return x509Cert;
             }
@@ -253,11 +253,11 @@
 
     static class JwtToken
     {
-#region Logger
+        #region Logger
         private static Logger logger = LogManager.GetCurrentClassLogger();
-#endregion
+        #endregion
 
-#region Public Methods
+        #region Public Methods
         public static string GenerateToken(X509Certificate2 Certificate, List<Claim> claims, DateTime validUntil)
         {
             try
@@ -298,32 +298,32 @@
                 return false;
             }
         }
-#endregion
+        #endregion
     }
 
     class QlikClientCertificate
     {
-#region Logger
+        #region Logger
         private static Logger logger = LogManager.GetCurrentClassLogger();
-#endregion
+        #endregion
 
-#region Enums
+        #region Enums
         public enum PemStringType
         {
             Certificate,
             RsaPrivateKey
         }
-#endregion
+        #endregion
 
-#region Properties & Variables
+        #region Properties & Variables
         private string PublicCertificate { get; set; }
         private string PrivateKey { get; set; }
         private string Password { get; set; }
         private bool IsSingleFile { get; set; }
         public static string DefaultFolder => @"C:\ProgramData\Qlik\Sense\Repository\Exported Certificates\.Local Certificates";
-#endregion
+        #endregion
 
-#region Constructor
+        #region Constructor
         public QlikClientCertificate(string certKeyFilePath, string password)
         {
             PublicCertificate = File.ReadAllText(certKeyFilePath);
@@ -344,9 +344,9 @@
             IsSingleFile = false;
             Password = password;
         }
-#endregion
+        #endregion
 
-#region Static Helper Functions
+        #region Static Helper Functions
         //This function parses an integer size from the reader using the ASN.1 format
         private static int DecodeIntegerSize(System.IO.BinaryReader rd)
         {
@@ -492,9 +492,9 @@
                 rd.Close();
             }
         }
-#endregion
+        #endregion
 
-#region Public Methods
+        #region Public Methods
         public X509Certificate2 GetCertificateFromPEM(string friendlyName = "QlikClient")
         {
             try
@@ -520,16 +520,16 @@
                 return null;
             }
         }
-#endregion
+        #endregion
     }
 
     class RSAParameterTraits
     {
-#region Logger
+        #region Logger
         private static Logger logger = LogManager.GetCurrentClassLogger();
-#endregion
+        #endregion
 
-#region Fields
+        #region Fields
         public int size_Mod = -1;
         public int size_Exp = -1;
         public int size_D = -1;
@@ -538,9 +538,9 @@
         public int size_DP = -1;
         public int size_DQ = -1;
         public int size_InvQ = -1;
-#endregion
+        #endregion
 
-#region Public Methods
+        #region Public Methods
         public RSAParameterTraits(int modulusLengthInBits)
         {
             try
@@ -603,7 +603,7 @@
                 logger.Error(ex, $"The Method \"{nameof(RSAParameterTraits)}\" has failed.");
             }
         }
-#endregion
+        #endregion
     }
-#endregion
+    #endregion
 }
