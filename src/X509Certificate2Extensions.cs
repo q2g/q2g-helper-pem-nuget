@@ -4,18 +4,15 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Security.Claims;
-    using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
     using Org.BouncyCastle.Crypto.Parameters;
-    using System.Text;
     #endregion
 
     public static class X509Certificate2Extensions
     {
         #region Public Methods
-        public static void SavePem(this X509Certificate2 @this, out string cert, out   string privateKey)
+        public static void SavePem(this X509Certificate2 @this, out string cert, out string privateKey)
         {
             cert = string.Empty;
             privateKey = string.Empty;
@@ -172,6 +169,6 @@
 
             return cert;
         }
-#endregion
+        #endregion
     }
 }
