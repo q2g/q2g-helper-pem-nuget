@@ -48,17 +48,17 @@
             }
         }
 
-        public bool IsValidPublicKey(string data, string sign, string algorithm = "SHA256withRSA")
+        public bool ValidSignature(string data, string base64Data, HashAlgorithmName hashAlgorithm)
         {
             try
             {
-                var sig = Convert.FromBase64String(sign);
-                ISigner signer = SignerUtilities.GetSigner(algorithm);
-                signer.Init(false, PublicKey);
-
-                var msgBytes = Encoding.UTF8.GetBytes(data);
-                signer.BlockUpdate(msgBytes, 0, msgBytes.Length);
-                return signer.VerifySignature(sig);
+                var sha = new SHA256CryptoServiceProvider();
+                var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(data));
+                var signature = Convert.FromBase64String(base64Data);
+                using RSA rsa = RSA.Create();
+                var rsaParameters = PemUtils.ToRSAParameters(PrivateKey);
+                rsa.ImportParameters(rsaParameters);
+                return rsa.VerifyHash(hash, signature, hashAlgorithm, RSASignaturePadding.Pss);
             }
             catch (Exception ex)
             {
@@ -66,27 +66,19 @@
             }
         }
 
-        public string SignWithPrivateKey(string data, bool write_algo_as_prefix = false, bool use_indent = false, string algorithm = "SHA256")
+        public string SignWithPrivateKey(string data, HashAlgorithmName hashAlgorithm, bool useIndent = false)
         {
             try
             {
-                var rsa = RSA.Create() as RSACryptoServiceProvider;
+                using RSA rsa = RSA.Create();
                 var rsaParameters = PemUtils.ToRSAParameters(PrivateKey);
                 rsa.ImportParameters(rsaParameters);
-
                 var sha = new SHA256CryptoServiceProvider();
                 var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(data));
-                var id = CryptoConfig.MapNameToOID(algorithm);
-                var sig = rsa.SignHash(hash, id);
-
-                var prefix = String.Empty;
-                if (write_algo_as_prefix)
-                    prefix = $"{algorithm}:\n";
-
-                if (use_indent)
-                    return prefix + Convert.ToBase64String(sig, Base64FormattingOptions.InsertLineBreaks);
-
-                return prefix + Convert.ToBase64String(sig);
+                var signature = rsa.SignHash(hash, hashAlgorithm, RSASignaturePadding.Pss);
+                if (useIndent)
+                    return Convert.ToBase64String(signature, Base64FormattingOptions.InsertLineBreaks);
+                return Convert.ToBase64String(signature);
             }
             catch (Exception ex)
             {
