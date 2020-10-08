@@ -36,11 +36,9 @@
         {
             try
             {
-                using (var reader = new StreamReader(public_key_path, Encoding.ASCII))
-                {
-                    var pemReader = new PemReader(reader);
-                    return pemReader.ReadObject() as RsaKeyParameters;
-                }
+                using var reader = new StreamReader(public_key_path, Encoding.ASCII);
+                var pemReader = new PemReader(reader);
+                return pemReader.ReadObject() as RsaKeyParameters;
             }
             catch (Exception ex)
             {
