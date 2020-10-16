@@ -25,6 +25,6 @@
     <PackageReference Include="GitVersionTask" Version="5.3.7" PrivateAssets="All" />
     <PackageReference Include="NLog" Version="4.7.5" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.8" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
   </ItemGroup>
 </Project>
