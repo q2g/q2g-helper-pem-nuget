@@ -509,8 +509,6 @@
                 var newCertificate = new X509Certificate2(certBuffer, Password);
                 var rsaPrivateKey = DecodeRsaPrivateKey(keyBuffer);
                 newCertificate = newCertificate.CopyWithPrivateKey(rsaPrivateKey);
-                //only in .NET Classic
-                //newCertificate.PrivateKey = rsaPrivateKey;
                 newCertificate.FriendlyName = friendlyName;
                 return newCertificate;
             }
