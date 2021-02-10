@@ -347,35 +347,6 @@
         #endregion
 
         #region Static Helper Functions
-        //This function parses an integer size from the reader using the ASN.1 format
-        private static int DecodeIntegerSize(System.IO.BinaryReader rd)
-        {
-            var count = -1;
-
-            var byteValue = rd.ReadByte();
-            if (byteValue != 0x02)
-                return 0;
-
-            byteValue = rd.ReadByte();
-            if (byteValue == 0x81)
-                count = rd.ReadByte();
-            else if (byteValue == 0x82)
-            {
-                var hi = rd.ReadByte();
-                var lo = rd.ReadByte();
-                count = BitConverter.ToUInt16(new[] { lo, hi }, 0);
-            }
-            else
-                count = byteValue;        // we already have the data size
-
-            //remove high order zeros in data
-            while (rd.ReadByte() == 0x00)
-                count -= 1;
-
-            rd.BaseStream.Seek(-1, SeekOrigin.Current);
-            return count;
-        }
-
         private static byte[] GetBytesFromPEM(string pemString, PemStringType type)
         {
             string header;
@@ -397,100 +368,7 @@
 
             var start = pemString.IndexOf(header) + header.Length;
             var end = pemString.IndexOf(footer, start) - start;
-            return Convert.FromBase64String(pemString.Substring(start, end));
-        }
-
-        private static byte[] AlignBytes(byte[] inputBytes, int alignSize)
-        {
-            var inputBytesSize = inputBytes.Length;
-            if ((alignSize != -1) && (inputBytesSize < alignSize))
-            {
-                var buf = new byte[alignSize];
-                for (int i = 0; i < inputBytesSize; ++i)
-                    buf[i + (alignSize - inputBytesSize)] = inputBytes[i];
-
-                return buf;
-            }
-            else
-            {
-                //Already aligned, or doesn't need alignment
-                return inputBytes;
-            }
-        }
-
-        //This helper function parses an RSA private key using the ASN.1 format
-        private static RSACryptoServiceProvider DecodeRsaPrivateKey(byte[] privateKeyBytes)
-        {
-            var ms = new MemoryStream(privateKeyBytes);
-            var rd = new BinaryReader(ms);
-
-            try
-            {
-                var shortValue = rd.ReadUInt16();
-                switch (shortValue)
-                {
-                    case 0x8130:
-                        // If true, data is little endian since the proper logical seq is 0x30 0x81
-                        rd.ReadByte(); //advance 1 byte
-                        break;
-                    case 0x8230:
-                        rd.ReadInt16();  //advance 2 bytes
-                        break;
-                    default:
-                        return null;
-                }
-
-                shortValue = rd.ReadUInt16();
-                if (shortValue != 0x0102) // (version number)
-                    return null;
-
-                var byteValue = rd.ReadByte();
-                if (byteValue != 0x00)
-                    return null;
-
-                // The data following the version will be the ASN.1 data itself, which in our case
-                // are a sequence of integers.
-
-                // In order to solve a problem with instancing RSACryptoServiceProvider
-                // via default constructor on .net 4.0 this is a hack
-                var parms = new CspParameters()
-                {
-                    Flags = CspProviderFlags.NoFlags,
-                    KeyContainerName = Guid.NewGuid().ToString().ToUpperInvariant(),
-                    ProviderType = ((Environment.OSVersion.Version.Major > 5) || ((Environment.OSVersion.Version.Major == 5) && (Environment.OSVersion.Version.Minor >= 1))) ? 0x18 : 1,
-                };
-
-                var rsa = new RSACryptoServiceProvider(parms);
-                var rsAparams = new RSAParameters()
-                {
-                    Modulus = rd.ReadBytes(DecodeIntegerSize(rd)),
-                };
-
-                // Argh, this is a pain.  From emperical testing it appears to be that RSAParameters doesn't like byte buffers that
-                // have their leading zeros removed.  The RFC doesn't address this area that I can see, so it's hard to say that this
-                // is a bug, but it sure would be helpful if it allowed that. So, there's some extra code here that knows what the
-                // sizes of the various components are supposed to be.  Using these sizes we can ensure the buffer sizes are exactly
-                // what the RSAParameters expect.  Thanks, Microsoft.
-                var traits = new RSAParameterTraits(rsAparams.Modulus.Length * 8);
-                rsAparams.Modulus = AlignBytes(rsAparams.Modulus, traits.size_Mod);
-                rsAparams.Exponent = AlignBytes(rd.ReadBytes(DecodeIntegerSize(rd)), traits.size_Exp);
-                rsAparams.D = AlignBytes(rd.ReadBytes(DecodeIntegerSize(rd)), traits.size_D);
-                rsAparams.P = AlignBytes(rd.ReadBytes(DecodeIntegerSize(rd)), traits.size_P);
-                rsAparams.Q = AlignBytes(rd.ReadBytes(DecodeIntegerSize(rd)), traits.size_Q);
-                rsAparams.DP = AlignBytes(rd.ReadBytes(DecodeIntegerSize(rd)), traits.size_DP);
-                rsAparams.DQ = AlignBytes(rd.ReadBytes(DecodeIntegerSize(rd)), traits.size_DQ);
-                rsAparams.InverseQ = AlignBytes(rd.ReadBytes(DecodeIntegerSize(rd)), traits.size_InvQ);
-                rsa.ImportParameters(rsAparams);
-                return rsa;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-            finally
-            {
-                rd.Close();
-            }
+            return Convert.FromBase64String(pemString.Substring(start, end)?.Trim());
         }
         #endregion
 
@@ -505,12 +383,10 @@
                     keyBuffer = GetBytesFromPEM(PublicCertificate, PemStringType.RsaPrivateKey);
                 else
                     keyBuffer = GetBytesFromPEM(PrivateKey, PemStringType.RsaPrivateKey);
-
                 var newCertificate = new X509Certificate2(certBuffer, Password);
-                var rsaPrivateKey = DecodeRsaPrivateKey(keyBuffer);
+                var rsaPrivateKey = RSA.Create();
+                rsaPrivateKey.ImportRSAPrivateKey(keyBuffer, out _);
                 newCertificate = newCertificate.CopyWithPrivateKey(rsaPrivateKey);
-                //only in .NET Classic
-                //newCertificate.PrivateKey = rsaPrivateKey;
                 newCertificate.FriendlyName = friendlyName;
                 return newCertificate;
             }
