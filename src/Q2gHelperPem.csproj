@@ -6,26 +6,22 @@
     <Authors>akquinet finance &amp; controlling GmbH</Authors>
     <Copyright>Copyright (c) $([System.DateTime]::Today.ToString('yyyy'))</Copyright>
     <Company>akquinet finance &amp; controlling GmbH</Company>
-    <RepositoryUrl>https://github.com/q2g/q2g-helper-pem-nuget</RepositoryUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/q2g/q2g-helper-pem-nuget/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl></PackageProjectUrl>
     <PackageTags>qlik, PEM, certificates</PackageTags>
     <Description>Includes extensions for the class X509Certificate2, a signer, and the certificate creation.</Description>
-    <Version>$(GitVersion_InformationalVersion)</Version>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+    <AssemblyVersion>5.1.2.0</AssemblyVersion>
+    <FileVersion>5.1.2.0</FileVersion>
   </PropertyGroup>
 
-  <Target Name="GitVersion" BeforeTargets="AfterBuild">
-    <Message Importance="High" Text="++++++ GitVersion: $(GitVersion_InformationalVersion) ++++++" />
-  </Target>
-
   <ItemGroup>
-    <PackageReference Include="GitVersionTask" Version="5.5.1" PrivateAssets="All" />
     <PackageReference Include="NLog" Version="4.7.9" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.10" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.10.1" />
   </ItemGroup>
+
+  <Target Name="ShowAssemblyVersion" BeforeTargets="AfterBuild">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="MyAssemblyIdentities" />
+    </GetAssemblyIdentity>
+    <Message Importance="High" Text="++++++ AssemblyVersion: %(MyAssemblyIdentities.Version) ++++++" />
+  </Target>
 </Project>
