@@ -54,7 +54,7 @@
                 var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(data));
                 var signature = Convert.FromBase64String(base64Data);
                 using RSA rsa = RSA.Create();
-                var rsaParameters = PemUtils.ToRSAParameters(PrivateKey);
+                var rsaParameters = PemUtilsHelper.ToRSAParameters(PrivateKey);
                 rsa.ImportParameters(rsaParameters);
                 return rsa.VerifyHash(hash, signature, hashAlgorithm, RSASignaturePadding.Pss);
             }
@@ -69,7 +69,7 @@
             try
             {
                 using RSA rsa = RSA.Create();
-                var rsaParameters = PemUtils.ToRSAParameters(PrivateKey);
+                var rsaParameters = PemUtilsHelper.ToRSAParameters(PrivateKey);
                 rsa.ImportParameters(rsaParameters);
                 var sha = new SHA256CryptoServiceProvider();
                 var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(data));

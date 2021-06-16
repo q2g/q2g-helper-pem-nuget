@@ -140,7 +140,7 @@
                 var rsaparams = new RsaPrivateCrtKeyParameters(rsa.Modulus, rsa.PublicExponent, rsa.PrivateExponent,
                                                                rsa.Prime1, rsa.Prime2, rsa.Exponent1, rsa.Exponent2,
                                                                rsa.Coefficient);
-                x509 = x509.CopyWithPrivateKey(PemUtils.ToRSA(rsaparams));
+                x509 = x509.CopyWithPrivateKey(PemUtilsHelper.ToRSA(rsaparams));
                 return x509;
             }
             catch (Exception ex)
@@ -222,7 +222,7 @@
             try
             {
                 var keyPair = ReadPrivateKey(privateKeyFile);
-                var rsaPrivateKey = PemUtils.ToRSA(keyPair.Private as RsaPrivateCrtKeyParameters);
+                var rsaPrivateKey = PemUtilsHelper.ToRSA(keyPair.Private as RsaPrivateCrtKeyParameters);
                 certificate = certificate.CopyWithPrivateKey(rsaPrivateKey);
                 return certificate;
             }
@@ -238,7 +238,7 @@
             try
             {
                 var keyPair = ReadPrivateKey(privateKeyBuffer);
-                var rsaPrivateKey = PemUtils.ToRSA(keyPair.Private as RsaPrivateCrtKeyParameters);
+                var rsaPrivateKey = PemUtilsHelper.ToRSA(keyPair.Private as RsaPrivateCrtKeyParameters);
                 certificate = certificate.CopyWithPrivateKey(rsaPrivateKey);
                 return certificate;
             }

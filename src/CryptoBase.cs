@@ -33,9 +33,9 @@
         {
             var rsaParameters = new RSAParameters();
             if (HasPrivateKey)
-                rsaParameters = PemUtils.ToRSAParameters(PrivateKey);
+                rsaParameters = PemUtilsHelper.ToRSAParameters(PrivateKey);
             else
-                rsaParameters = PemUtils.ToRSAParameters(PublicKey);
+                rsaParameters = PemUtilsHelper.ToRSAParameters(PublicKey);
             var rsa = new RSACryptoServiceProvider();
             rsa.ImportParameters(rsaParameters);
             return rsa;
