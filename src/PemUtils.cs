@@ -1,57 +1,48 @@
 ﻿namespace Q2g.HelperPem
 {
     #region Usings
-    using Org.BouncyCastle.Crypto.Parameters;
-    using System.Security.Cryptography;
+    using System;
+    using System.Security.Cryptography.X509Certificates;
     #endregion
 
-    internal class PemUtils
+    public class PemUtils
     {
         #region Public Methods
-        public static RSA ToRSA(RsaKeyParameters rsaKey)
+        public static void AddRootCertifcateToStore(X509Certificate2 certificate)
         {
-            var rp = ToRSAParameters(rsaKey);
-            var rsaCsp = new RSACryptoServiceProvider();
-            rsaCsp.ImportParameters(rp);
-            return rsaCsp;
-        }
-
-        public static RSA ToRSA(RsaPrivateCrtKeyParameters privKey)
-        {
-            var rp = ToRSAParameters(privKey);
-            var rsaCsp = new RSACryptoServiceProvider();
-            rsaCsp.ImportParameters(rp);
-            return rsaCsp;
-        }
-
-        public static RSAParameters ToRSAParameters(RsaKeyParameters rsaKey)
-        {
-            var rp = new RSAParameters()
+            // The whole thing works only with administrative rights!!!
+            try
             {
-                Modulus = rsaKey.Modulus.ToByteArrayUnsigned(),
-            };
-
-            if (rsaKey.IsPrivate)
-                rp.D = rsaKey.Exponent.ToByteArrayUnsigned();
-            else
-                rp.Exponent = rsaKey.Exponent.ToByteArrayUnsigned();
-            return rp;
+                var store = new X509Store(StoreName.Root, StoreLocation.LocalMachine);
+                store.Open(OpenFlags.ReadWrite);
+                var storeCertificates = store.Certificates.Find(X509FindType.FindByIssuerName, certificate.FriendlyName, false);
+                foreach (var storeCert in storeCertificates)
+                    store.Remove(storeCert);
+                store.Add(certificate);
+                store.Close();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("The certificate could not be added to the certificate store.", ex);
+            }
         }
 
-        public static RSAParameters ToRSAParameters(RsaPrivateCrtKeyParameters privKey)
+        public static void RemoveRootCertifcateFromStore(string friendlyName)
         {
-            var rp = new RSAParameters()
+            // The whole thing works only with administrative rights!!!
+            try
             {
-                Modulus = privKey.Modulus.ToByteArrayUnsigned(),
-                Exponent = privKey.PublicExponent.ToByteArrayUnsigned(),
-                D = privKey.Exponent.ToByteArrayUnsigned(),
-                P = privKey.P.ToByteArrayUnsigned(),
-                Q = privKey.Q.ToByteArrayUnsigned(),
-                DP = privKey.DP.ToByteArrayUnsigned(),
-                DQ = privKey.DQ.ToByteArrayUnsigned(),
-                InverseQ = privKey.QInv.ToByteArrayUnsigned()
-            };
-            return rp;
+                var store = new X509Store(StoreName.Root, StoreLocation.LocalMachine);
+                store.Open(OpenFlags.ReadWrite);
+                var storeCertificates = store.Certificates.Find(X509FindType.FindByIssuerName, friendlyName, false);
+                foreach (var storeCert in storeCertificates)
+                    store.Remove(storeCert);
+                store.Close();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("The certificate could not be removed from the certificate store.", ex);
+            }
         }
         #endregion
     }
