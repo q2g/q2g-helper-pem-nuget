@@ -107,6 +107,27 @@
                 throw new Exception("The public key could not saved.", ex);
             }
         }
+
+        public string GetHashFromTextWithPrivateKey(string data, bool useIndent = false)
+        {
+            try
+            {
+                using (RSA rsa = RSA.Create())
+                {
+                    var rsaParameters = PemUtilsHelper.ToRSAParameters(PrivateKey);
+                    rsa.ImportParameters(rsaParameters);
+                    var sha = SHA256.Create();
+                    var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(data));
+                    if (useIndent)
+                        return Convert.ToBase64String(hash, Base64FormattingOptions.InsertLineBreaks);
+                    return Convert.ToBase64String(hash);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Data could not signing.", ex);
+            }
+        }
         #endregion
     }
 }
