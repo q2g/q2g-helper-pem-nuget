@@ -35,7 +35,8 @@
         #endregion
 
         #region Properties & Variables
-        public static AsymmetricCipherKeyPair userKeyPair = null;
+        private static AsymmetricCipherKeyPair userKeyPair = null;
+        private static Random randomCount = new Random();
         #endregion
 
         #region Private Methods
@@ -104,7 +105,11 @@
                 keyPairGenerator.Init(keyGenerationParameters);
 
                 if (userKeyPair == null)
-                    userKeyPair = keyPairGenerator.GenerateKeyPair();
+                {
+                    var count = randomCount.Next(0, 1000);
+                    for (int i = 0; i < count; i++)
+                        userKeyPair = keyPairGenerator.GenerateKeyPair();
+                }
 
                 certificateGenerator.SetPublicKey(userKeyPair.Public);
 
