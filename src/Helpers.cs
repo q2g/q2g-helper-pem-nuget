@@ -77,7 +77,8 @@
             try
             {
                 // Generating Random Numbers
-                var randomGenerator = new VmpcRandomGenerator();
+                // var randomGenerator = new VmpcRandomGenerator(); // Old version
+                var randomGenerator = new CryptoApiRandomGenerator();
                 var random = new SecureRandom(randomGenerator);
 
                 // The Certificate Generator
@@ -105,11 +106,7 @@
                 keyPairGenerator.Init(keyGenerationParameters);
 
                 if (userKeyPair == null)
-                {
-                    var count = randomCount.Next(0, 1000);
-                    for (int i = 0; i < count; i++)
-                        userKeyPair = keyPairGenerator.GenerateKeyPair();
-                }
+                    userKeyPair = keyPairGenerator.GenerateKeyPair();
 
                 certificateGenerator.SetPublicKey(userKeyPair.Public);
 
