@@ -77,8 +77,7 @@
             try
             {
                 // Generating Random Numbers
-                // var randomGenerator = new VmpcRandomGenerator(); // Old version
-                var randomGenerator = new CryptoApiRandomGenerator();
+                var randomGenerator = new VmpcRandomGenerator();
                 var random = new SecureRandom(randomGenerator);
 
                 // The Certificate Generator
