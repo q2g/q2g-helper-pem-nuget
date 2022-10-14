@@ -118,9 +118,10 @@
                     rsa.ImportParameters(rsaParameters);
                     var sha = SHA256.Create();
                     var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(data));
+                    var result = rsa.SignHash(hash, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
                     if (useIndent)
-                        return Convert.ToBase64String(hash, Base64FormattingOptions.InsertLineBreaks);
-                    return Convert.ToBase64String(hash);
+                        return Convert.ToBase64String(result, Base64FormattingOptions.InsertLineBreaks);
+                    return Convert.ToBase64String(result);
                 }
             }
             catch (Exception ex)
